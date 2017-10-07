@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -100,21 +100,21 @@ namespace analizadorLexico
 new int[]{134,3},
 new int[]{-1},
 new int[]{4,5,127,8,126,9},
-new int[]{101,6},
+new int[]{101,10000,6},
 new int[]{128,4,5},
 new int[]{-1},
 new int[]{7},
 new int[]{-1},
 new int[]{124,102,125,7},
 new int[]{-1},
-new int[]{10},
-new int[]{135,10,112,11},
+new int[]{10,10002},
+new int[]{135,10003,10,112,11},
 new int[]{3},
 new int[]{-1},
-new int[]{136},
-new int[]{137},
-new int[]{138},
-new int[]{139},
+new int[]{136,10001},
+new int[]{137,10001},
+new int[]{138,10001},
+new int[]{139,10001},
 new int[]{102},
 new int[]{103},
 new int[]{104},
@@ -270,7 +270,7 @@ new int[]{-1}
             }
             return ch;
         }
-
+        string var;
         int relaciona(int c)
         {
             int col = 31;
@@ -396,14 +396,17 @@ new int[]{-1}
                         else
                         {
                             // l.AppendText("identificador \n");
-                            l.AppendText("identificador :" + txt.Text.Substring(i, f - i).Trim() + "\n");
+                            var = txt.Text.Substring(i, f - i).Trim();
+                            l.AppendText("identificador :" +var + "\n");
+                            
                             //asigna 101
                             t = e + 1;
                         }
                         break;
                     }
                 case 101:
-                    l.AppendText("identificador "+txt.Text.Substring(i,f-i).Trim()+"\n");
+                   var = txt.Text.Substring(i, f - i).Trim();
+                    l.AppendText("identificador "+var+"\n");
                     break;
                 case 102:
                     l.AppendText("constante entera \n");
@@ -571,11 +574,16 @@ new int[]{-1}
                     continue;
                 }
                 //mientrasa el tope de pila es una fila de la predictivoa
-                while (pila.Peek() < 50)
+                while (pila.Peek() < 50 || pila.Peek()>=10000)
                 {
-                    if (pila.Peek() > -1)
+                    if (pila.Peek() >= 10000)
                     {
+                        acciones(pila.Pop());
 
+                    }
+                    if (pila.Peek() > -1 && pila.Peek()<50)
+                    {
+                        
                         filap = predictiva[pila.Peek() - 1, t - 101] - 1;
                         Console.WriteLine("Producción: " + (filap + 1));
                         //si la posicion en la matriz devuelve un numero de producción
@@ -588,6 +596,7 @@ new int[]{-1}
                             {
                                 pila.Push(producciones[filap][i]);
                             }
+                          
                             foreach (int i in pila)
                             {
                                 Console.Write(" " + i + " ");
@@ -595,8 +604,10 @@ new int[]{-1}
                             Console.WriteLine("");
                         }
                         //si la posición en la matriz devuelve un error
+
                         else
                         {
+
                             Console.WriteLine("Error: " + filap + " con tope: " + pila.Peek() + " y token: " + t);
                             errorS(tx2, (filap + 1));
                             return -1;
@@ -607,6 +618,7 @@ new int[]{-1}
                     {
                         Console.WriteLine("Sale: " + pila.Pop());
                     }
+                    
 
                 }
 
@@ -615,6 +627,11 @@ new int[]{-1}
                 //si la predicción es correcta
                 if (prediccion == t)
                 {
+                    if (pila.Peek() >= 10000)
+                    {
+                        acciones(pila.Pop());
+
+                    }
                     //saca ese elemento de la pila
                     Console.WriteLine("Prediccion correcta");
                     Console.WriteLine("Sale: " + pila.Pop());
@@ -622,6 +639,7 @@ new int[]{-1}
                 // si no es correcta
                 else if (prediccion != t)
                 {
+                   
                     //manda error
                     Console.WriteLine("Error: se esperaba token " + prediccion);
                     errorS(tx2, prediccion);
@@ -654,6 +672,12 @@ new int[]{-1}
             else
             {
                 tx2.AppendText( "Sintáxis correcta");
+                foreach (TabSimbol p in tabla_simbolos)
+                {
+                    Console.WriteLine("Dir: {0} Descripcion: {1} Tipo: {2} TipoVar:{3}",p.direccion,p.descripcion, p.tipo,p.var);
+                }
+                tabla_simbolos.Clear();
+                dr = 10000;
             }
             return 0;
         }
@@ -974,10 +998,18 @@ new int[]{-1}
             switch (accion-10000)
             {
                 case 0:
-                    Console.WriteLine("HOLA");
-                    
+                    //Console.WriteLine("HOLA");
+                    ag_simbolos(var);
                     break;
-
+                case 1:
+                    ag_t_simbolos(clave);
+                    break;
+                case 2:
+                    tabla_simbolos.Where(o => o.var == ' ').ToList().ForEach(o => o.var = 'v');
+                    break;
+                case 3:
+                    tabla_simbolos.Where(o => o.var == ' ').ToList().ForEach(o => o.var = 'c');
+                    break;
             }
         }
 
@@ -995,29 +1027,38 @@ new int[]{-1}
         }
 
         //inicio dir 
-        int dr=10000;
+        int dr=10000,dir=20000;
         public void ag_simbolos(string desc)
         {
             
-            tabla_simbolos.Clear();
+           
             //existe = tabla_simbolos.Where(p => descripcion == desc);
             //busca en la lista para ver si ya existe esa variable
             var existe = tabla_simbolos.FirstOrDefault(p => p.descripcion == desc);
             if (existe != null)
             {
+                //si existe despliega un mensaje faltan acciones
                 MessageBox.Show("La variable ya existe");
             }else
             {
-                tabla_simbolos.Add(new TabSimbol(dr,desc,0,0 ));
+                //si no existe agrega un nuevo objeto a la lista con la direccion consecutiva
+                //la descripcion recibida y con tipo y ram en 0 para indicar que no tienen un valor definida para esas propiedades
+                tabla_simbolos.Add(new TabSimbol(dr,desc,0,0,' '));
                 MessageBox.Show("Variable agregada correctamente");
                 dr++;
             }
             
         }
+        public void ag_t_simbolos(int tip)
+        {
+            //selecciona todos los objetos cuya propiedad tipo sea igual a 0 y les asigna el tipo
+            tabla_simbolos.Where(o => o.tipo == 0).ToList().ForEach(o => o.tipo = tip);
+        }
 
-        
         #endregion semantico
     }
+
+   
 
     public class TabSimbol 
     {
@@ -1025,15 +1066,20 @@ new int[]{-1}
         public string descripcion { get; set; }
         public int tipo { get; set; }
         public object ram { get; set; }
-
-        public TabSimbol(int d,string desc,int tipo, object r)
+        public char var { get; set; }
+        
+        public TabSimbol(int d,string desc,int tipo, object r,char var)
         {
             this.direccion = d;
             this.descripcion = desc;
             this.tipo = tipo;
             this.ram = r;
+            this.var = var;          
         }
     }
+
+    
+
     class Cuadruplo
     {
         public int codop;
@@ -1041,5 +1087,5 @@ new int[]{-1}
         public int op2;
         public int res;
     }
-}
+
 
