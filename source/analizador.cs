@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using System.Collections;
 namespace analizadorLexico
 {
-    class analizador 
+    class analizador
     {
         #region variables-lexico
         public int[,] M = {
@@ -100,26 +100,26 @@ namespace analizadorLexico
 new int[]{134,3},
 new int[]{-1},
 new int[]{4,5,127,8,126,9},
-new int[]{101,6},
+new int[]{101,10000,6},
 new int[]{128,4,5},
 new int[]{-1},
 new int[]{7},
 new int[]{-1},
 new int[]{124,102,125,7},
 new int[]{-1},
-new int[]{10},
-new int[]{135,10,112,11},
+new int[]{10,10002},
+new int[]{135,10003,10,112,11 },
 new int[]{3},
 new int[]{-1},
-new int[]{136},
-new int[]{137},
-new int[]{138},
-new int[]{139},
-new int[]{102},
-new int[]{103},
-new int[]{104},
-new int[]{105},
-new int[]{106},
+new int[]{136,10001},
+new int[]{137,10001},
+new int[]{138,10001},
+new int[]{139,10001},
+new int[]{10004,102},
+new int[]{10004,103},
+new int[]{10004,104},
+new int[]{10004,105},
+new int[]{10004,106},
 new int[]{15,13},
 new int[]{34,13},
 new int[]{37,13},
@@ -131,42 +131,42 @@ new int[]{126,14},
 new int[]{12},
 new int[]{-1},
 new int[]{16,112,20},
-new int[]{101,17},
+new int[]{101,17,10006}, //buscar
 new int[]{124,18,125},
 new int[]{-1},
 new int[]{20,19},
 new int[]{128,18},
 new int[]{-1},
 new int[]{21,22},
-new int[]{121,20},
+new int[]{121,10005,20},
 new int[]{-1},
 new int[]{23,24},
-new int[]{120,21},
+new int[]{ 10005, 120,21},
 new int[]{-1},
 new int[]{26,25},
-new int[]{119},
+new int[]{10005,119},
 new int[]{-1},
 new int[]{27,28},
 new int[]{30,27},
 new int[]{-1},
 new int[]{31,29},
-new int[]{107,27},
-new int[]{108,27},
+new int[]{10005,107, 27},
+new int[]{ 10005, 108,27},
 new int[]{-1},
-new int[]{33,32},
-new int[]{109,31},
-new int[]{110,31},
-new int[]{111,31},
+new int[]{33,32,10007},
+new int[]{ 10005, 109, 31},
+new int[]{ 10005, 110, 31},
+new int[]{ 10005, 111, 31},
 new int[]{-1},
 new int[]{16},
 new int[]{102},
 new int[]{103},
-new int[]{113},
-new int[]{118},
-new int[]{114},
-new int[]{115},
-new int[]{116},
-new int[]{117},
+new int[]{ 10005, 113 },
+new int[]{ 10005, 118 },
+new int[]{ 10005, 114 },
+new int[]{ 10005, 115 },
+new int[]{ 10005, 116 },
+new int[]{ 10005, 117 },
 new int[]{104},
 new int[]{105},
 new int[]{106},
@@ -191,9 +191,38 @@ new int[]{-1}
         #endregion variables-sintactico
 
         #region variables-semantico
-        public Stack<int> operadores,tipos, operandos, avail, saltos = new Stack<int>();
+        public Stack<int> operadores = new Stack<int>(), tipos = new Stack<int>()
+           , operandos = new Stack<int>(), avail = new Stack<int>(), saltos = new Stack<int>();
         public List<Cuadruplo> cuadruplos = new List<Cuadruplo>();
         public List<TabSimbol> tabla_simbolos = new List<TabSimbol>();
+        public List<TabConst> tabla_constantes = new List<TabConst>();
+        int[,,] reglas = new int[4, 4, 14] {
+                      /*Enteros*/{
+                                          { 136,136,136,137,136,154,154,154,154,154,154,154,-1,-1},
+                                          { 137,137,137,137,-1,154,154,154,154,154,154,154,-1,-1},
+                                          { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+                                          {  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1}
+                                        },
+                     /*Float*/     {
+                                         { 137,137,137,137,-1,154,154,154,154,154,154,154,-1,-1},
+                                         { 137,137,137,137,-1,154,154,154,154,154,154,154,-1,-1 },
+                                         {  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+                                         {  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1}
+                                       },
+                   /*Char*/      {
+                                         {  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+                                         {  -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 },
+                                         {-1,-1,-1,-1,-1,154,154,154,154,154,154,154,-1,-1 },
+                                         { -1,-1,-1,-1,-1,154,154,154,154,154,154,154,-1,-1 }
+                                       },
+                  /*String*/      {
+                                        { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+                                        { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+                                        {  -1,-1,-1,-1,-1,154,154,154,154,154,154,154,-1,-1 },
+                                        {  -1,-1,-1,-1,-1,154,154,154,154,154,154,154,-1,-1}
+                                        }
+};
+
 
         #endregion variables-semantico
 
@@ -270,7 +299,7 @@ new int[]{-1}
             }
             return ch;
         }
-
+        string var;
         int relaciona(int c)
         {
             int col = 31;
@@ -396,14 +425,17 @@ new int[]{-1}
                         else
                         {
                             // l.AppendText("identificador \n");
-                            l.AppendText("identificador :" + txt.Text.Substring(i, f - i).Trim() + "\n");
+                            var = txt.Text.Substring(i, f - i).Trim();
+                            l.AppendText("identificador :" +var + "\n");
+                            
                             //asigna 101
                             t = e + 1;
                         }
                         break;
                     }
                 case 101:
-                    l.AppendText("identificador "+txt.Text.Substring(i,f-i).Trim()+"\n");
+                   var = txt.Text.Substring(i, f - i).Trim();
+                    l.AppendText("identificador "+var+"\n");
                     break;
                 case 102:
                     l.AppendText("constante entera \n");
@@ -571,11 +603,16 @@ new int[]{-1}
                     continue;
                 }
                 //mientrasa el tope de pila es una fila de la predictivoa
-                while (pila.Peek() < 50)
+                while (pila.Peek() < 50 || pila.Peek()>=10000)
                 {
-                    if (pila.Peek() > -1)
+                    if (pila.Peek() >= 10000)
                     {
+                        acciones(pila.Pop());
 
+                    }
+                    if (pila.Peek() > -1 && pila.Peek()<50)
+                    {
+                        
                         filap = predictiva[pila.Peek() - 1, t - 101] - 1;
                         Console.WriteLine("Producción: " + (filap + 1));
                         //si la posicion en la matriz devuelve un numero de producción
@@ -588,6 +625,7 @@ new int[]{-1}
                             {
                                 pila.Push(producciones[filap][i]);
                             }
+                          
                             foreach (int i in pila)
                             {
                                 Console.Write(" " + i + " ");
@@ -595,8 +633,10 @@ new int[]{-1}
                             Console.WriteLine("");
                         }
                         //si la posición en la matriz devuelve un error
+
                         else
                         {
+
                             Console.WriteLine("Error: " + filap + " con tope: " + pila.Peek() + " y token: " + t);
                             errorS(tx2, (filap + 1));
                             return -1;
@@ -607,6 +647,7 @@ new int[]{-1}
                     {
                         Console.WriteLine("Sale: " + pila.Pop());
                     }
+                    
 
                 }
 
@@ -615,6 +656,11 @@ new int[]{-1}
                 //si la predicción es correcta
                 if (prediccion == t)
                 {
+                    if (pila.Peek() >= 10000)
+                    {
+                        acciones(pila.Pop());
+
+                    }
                     //saca ese elemento de la pila
                     Console.WriteLine("Prediccion correcta");
                     Console.WriteLine("Sale: " + pila.Pop());
@@ -622,6 +668,7 @@ new int[]{-1}
                 // si no es correcta
                 else if (prediccion != t)
                 {
+                   
                     //manda error
                     Console.WriteLine("Error: se esperaba token " + prediccion);
                     errorS(tx2, prediccion);
@@ -654,6 +701,36 @@ new int[]{-1}
             else
             {
                 tx2.AppendText( "Sintáxis correcta");
+                Console.WriteLine("Tabla de simbolos");
+                foreach (TabSimbol p in tabla_simbolos)
+                {
+                    Console.WriteLine("Dir: {0} Descripcion: {1} Tipo: {2} TipoVar:{3}",p.direccion,p.descripcion, p.tipo,p.var);
+                }
+                Console.WriteLine("tabla de constantes");
+                foreach (TabConst c in tabla_constantes)
+                {
+                    Console.WriteLine("Dir: {0} Tipo: {1} Valor: {2}", c.dir, c.tipo, c.valor);
+                }
+                Console.WriteLine("Cuadruplos");
+                foreach (Cuadruplo c in cuadruplos)
+                {
+                    Console.WriteLine("Codop: {0}| Op1: {1} |Op2: {2}| Res:{3}", c.codop, c.op1, c.op2,c.res);
+                }
+                Console.WriteLine("Pila de operadores");
+                foreach(int op in operadores)
+                {
+                    Console.WriteLine("Operador: {0}", op);
+                }
+                Console.WriteLine("Pila de tipos");
+                foreach (int t in tipos)
+                {
+                    Console.WriteLine("Tipo: {0}", t);
+                }
+                tabla_simbolos.Clear();
+                tabla_constantes.Clear();
+                cuadruplos.Clear();
+                dr = 10000;
+                dir = 20000;
             }
             return 0;
         }
@@ -969,15 +1046,37 @@ new int[]{-1}
             }
         }
         #region semantico
+        
         public void acciones(int accion)
         {
             switch (accion-10000)
             {
                 case 0:
-                    Console.WriteLine("HOLA");
-                    
+                    //Console.WriteLine("HOLA");
+                    ag_simbolos(var);
                     break;
-
+                case 1:
+                    ag_t_simbolos(clave);
+                    break;
+                case 2:
+                    tabla_simbolos.Where(o => o.var == ' ').ToList().ForEach(o => o.var = 'v');
+                    break;
+                case 3:
+                    tabla_simbolos.Where(o => o.var == ' ').ToList().ForEach(o => o.var = 'c');
+                    break;
+                case 4:
+                    ag_consta(edo, 10);
+                    break;
+                case 5:
+                    MessageBox.Show("Operador: "+edo.ToString());
+                    operadores.Push(edo);
+                    break;
+                case 6:
+                    push_tipos(var);
+                    break;
+                case 7:
+                    oper_valida();
+                    break;
             }
         }
 
@@ -989,35 +1088,114 @@ new int[]{-1}
         {
             operandos.Push(ope);
         }
-        public void push_tipos(int t)
+        public void push_tipos(string desc)
         {
-            tipos.Push(t);
+            var t = tabla_simbolos.Where(x => x.descripcion == desc).Select(x => x.tipo).FirstOrDefault();
+            MessageBox.Show("Tipo"+t.ToString());
+            //int t= Convert.ToInt32(tabla_simbolos.Where(p => p.descripcion == desc).Select(p => p.tipo).ToString());
+            tipos.Push(t);          
         }
-
-        //inicio dir 
-        int dr=10000;
+        public void oper_valida()
+        {
+            int t1 = tipos.Peek()-136;
+            int t2 = tipos.Skip(1).First()-136;
+            int op = operadores.Peek()-107;
+            if (reglas[t1, t2, op] != -1)
+            {
+                MessageBox.Show("Operacion valida");
+            }
+            else
+            {
+                MessageBox.Show("Operacion no valida");
+            }
+        }
+        //inicio direcciones 
+        int dr=10000,dir=20000;
         public void ag_simbolos(string desc)
         {
             
-            tabla_simbolos.Clear();
+           
             //existe = tabla_simbolos.Where(p => descripcion == desc);
             //busca en la lista para ver si ya existe esa variable
             var existe = tabla_simbolos.FirstOrDefault(p => p.descripcion == desc);
             if (existe != null)
             {
+                //si existe despliega un mensaje faltan acciones
                 MessageBox.Show("La variable ya existe");
             }else
             {
-                tabla_simbolos.Add(new TabSimbol(dr,desc,0,0 ));
+                //si no existe agrega un nuevo objeto a la lista con la direccion consecutiva
+                //la descripcion recibida y con tipo y ram en 0 para indicar que no tienen un valor definida para esas propiedades
+                tabla_simbolos.Add(new TabSimbol(dr,desc,0,0,' '));
                 MessageBox.Show("Variable agregada correctamente");
                 dr++;
             }
             
         }
+        public void ag_t_simbolos(int tip)
+        {
+            //selecciona todos los objetos cuya propiedad tipo sea igual a 0 y les asigna el tipo
+            tabla_simbolos.Where(o => o.tipo == 0).ToList().ForEach(o => o.tipo = tip);
+        }
 
-        
+        public void ag_consta(int tipo,object val)
+        {
+            //si el tipo es una constante
+            if (tipo >= 102 && tipo <= 106)
+            {      
+                //si el tipo es constante entera o constante real
+           if (tipo == 102 || tipo ==103)
+                {
+                    //si el tipo de constante concuerda con el tipo de variable constante
+                    if ((tipo + 34) == tabla_simbolos.Last().tipo && tabla_simbolos.Last().var == 'c')
+                    {
+                        //agrega la constante en la tabla de constantes
+                        tabla_constantes.Add(new TabConst(dir, tipo, val));
+                        dir++;
+                        genera_cuadruplo(112, dir - 1, 0, tabla_simbolos.Last().direccion);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Tipo: " + tipo);
+                        MessageBox.Show("Error de tipos en tabla de constantes");
+                        
+                    }
+                }
+                 if (tipo == 105 || tipo == 106 || tipo ==104)
+                {
+                    if ((tipo + 33) == tabla_simbolos.Last().tipo && tabla_simbolos.Last().var == 'c')
+                    {
+                        tabla_constantes.Add(new TabConst(dir, tipo, val));
+                        dir++;
+                        genera_cuadruplo(112, dir - 1, 0,tabla_simbolos.Last().direccion);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Tipo: " + tipo);
+                        MessageBox.Show("Error de tipos en tabla de constantes");
+                       
+                    }
+                }
+               
+            }
+            
+            else
+            {
+       
+                MessageBox.Show("Tipo: " + tipo);
+                MessageBox.Show("Error de tipos en tabla de constantes");
+             
+            }
+        }
+
+        public void genera_cuadruplo(int c,int o1,int o2,int r)
+        {
+            cuadruplos.Add(new Cuadruplo(c, o1, o2, r));
+        }
         #endregion semantico
     }
+
+   
 
     public class TabSimbol 
     {
@@ -1025,13 +1203,33 @@ new int[]{-1}
         public string descripcion { get; set; }
         public int tipo { get; set; }
         public object ram { get; set; }
-
-        public TabSimbol(int d,string desc,int tipo, object r)
+        public char var { get; set; }
+        
+        public TabSimbol(int d,string desc,int tipo, object r,char var)
         {
             this.direccion = d;
             this.descripcion = desc;
             this.tipo = tipo;
             this.ram = r;
+            this.var = var;          
+        }
+    }
+
+    
+    public class TabConst
+    {
+      public  int dir;
+        public int tipo;
+        public object valor;
+
+        public TabConst(int d,int t,object v)
+        {
+            this.dir = d;
+            this.tipo = t;
+            this.valor = v;
+        }
+        
+
         }
     }
     class Cuadruplo
@@ -1040,6 +1238,14 @@ new int[]{-1}
         public int op1;
         public int op2;
         public int res;
+
+    public Cuadruplo(int cod,int o1,int o2,int r)
+    {
+        this.codop = cod;
+        this.op1 = o1;
+        this.op2 = o2;
+        this.res = r;
     }
-}
+    }
+
 
